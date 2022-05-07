@@ -23,16 +23,18 @@ prod_deployment_path = os.path.join(config['prod_deployment_path'])
 def store_model_into_pickle(model):
     # copy the latest pickle file, the latestscore.txt value, and the ingestfiles.txt file into the deployment directory
 
-    #modelname = 'trainedmodel.pkl'
+    # Copy model
     source = os.path.join(os.getcwd(), model_path, model)
     target = os.path.join(os.getcwd(), prod_deployment_path, model)
     shutil.copyfile(source, target)
 
+    # Copy latest information about the ingested data
     lastestdata = 'ingestedfiles.txt'
     source = os.path.join(os.getcwd(), dataset_csv_path, lastestdata)
     target = os.path.join(os.getcwd(), prod_deployment_path, lastestdata)
     shutil.copyfile(source, target)
 
+    # Copy latest performance score
     lastestscore = 'latestscore.txt'
     source = os.path.join(os.getcwd(), model_path, lastestscore)
     target = os.path.join(os.getcwd(), prod_deployment_path, lastestscore)
