@@ -37,7 +37,7 @@ def merge_multiple_dataframe():
 
     ingestionfile = open(os.path.join(os.getcwd(), output_folder_path, 'ingestedfiles.txt'), 'w')
     for element in allrecords:
-        ingestionfile.write(str(element)+ "\n")
+        ingestionfile.write(str(element) + "\n")
 
     ingestionfile.close()
 

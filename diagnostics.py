@@ -11,35 +11,35 @@ with open('config.json', 'r') as f:
     config = json.load(f)
 
 dataset_csv_path = os.path.join(config['output_folder_path'])
-test_data_path = os.path.join(config['test_data_path'])
 prod_deployment_path = os.path.join(config['prod_deployment_path'])
 
 
 # Function to get model predictions
-def model_predictions():
+def model_predictions(dataset):
     # read the deployed model and a test dataset, calculate predictions
     features_list = ['lastmonth_activity', 'lastyear_activity', 'number_of_employees']
-
-    df_test = pd.read_csv(os.path.join(test_data_path, 'testdata.csv'))
 
     modelname = 'trainedmodel.pkl'
     model = pickle.load(open(os.path.join(os.getcwd(), prod_deployment_path, modelname), 'rb'))
 
-    predictions = list(model.predict(df_test[features_list]))
+    predictions = list(model.predict(dataset[features_list]))
     return predictions  # return value should be a list containing all predictions
 
 
 # Function to get summary statistics
 def dataframe_summary():
-    # calculate summary statistics here
-    df_test = pd.read_csv(os.path.join(test_data_path, 'testdata.csv'))
+    file = os.path.join(os.getcwd(), dataset_csv_path, 'finaldata.csv')
+    df_test = pd.read_csv(file)
     means_list = list(df_test.mean())
+    median_list = list(df_test.median())
+    std_list = list(df_test.std())
 
-    return means_list  # return value should be a list containing all summary statistics
+    return [means_list, median_list, std_list]  # return value should be a list containing all summary statistics
 
 
 def dataframe_nas():
-    df_test = pd.read_csv(os.path.join(test_data_path, 'testdata.csv'))
+    file = os.path.join(os.getcwd(), dataset_csv_path, 'finaldata.csv')
+    df_test = pd.read_csv(file)
     nas = list(df_test.isna().sum())
     return [nas[i]/len(df_test.index) for i in range(len(nas))]
 
@@ -65,20 +65,14 @@ def execution_time():
 # Function to check dependencies
 def outdated_packages_list():
     # get a list of outdated packages
-    outdated = subprocess.check_output(['pip', 'list', '--outdated'])
-    print(outdated)
-    with open(os.path.join(os.getcwd(), 'outdated.txt'), 'wb') as outfile:
+    outdated = subprocess.check_output(['pip', 'list', '--outdated', '--format', 'columns'])
+    with open(os.path.join(os.getcwd(), prod_deployment_path, 'outdated.txt'), 'wb') as outfile:
         outfile.write(outdated)
+    return outdated.decode("utf-8")
 
 
 if __name__ == '__main__':
-    predict = model_predictions()
-    print(predict)
-    summary = dataframe_summary()
-    print(summary)
-    dataframe_nas = dataframe_nas()
-    print(dataframe_nas)
-    timing_process = execution_time()
-    print(timing_process)
+    dataframe_summary()
+    dataframe_nas()
+    execution_time()
     outdated_packages_list()
-

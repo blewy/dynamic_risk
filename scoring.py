@@ -32,11 +32,12 @@ def score_model():
 
     predictions = model.predict(df_test[features_list])
 
-    f1_score = metrics.f1_score(df_test[target], predictions, average=None)
+    f1_score = metrics.f1_score(df_test[target], predictions, average='macro')
 
     latestscore = open(os.path.join(os.getcwd(), model_path, 'latestscore.txt'), 'w')
-    latestscore.write(str(f1_score[1]) + "\n")
+    latestscore.write(str(f1_score) + "\n")
     latestscore.close()
+    return f1_score
 
 
 if __name__ == '__main__':
